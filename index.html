@@ -278,7 +278,7 @@ tr:hover td{background:rgba(46,168,85,.06)}
       </div>
     </div>
     <div class="grid">
-      <div class="card"><h3>💺 자리 변경권</h3><div class="price">가격: <span>30 코인</span></div><div style="font-size:.75rem;color:#f9a825;margin-bottom:8px" id="seatStatus"></div><button id="buy0">구매</button></div>
+      <div class="card"><h3>💺 자리 변경 우선권</h3><div class="price">가격: <span>30 코인</span></div><div style="font-size:.75rem;color:#f9a825;margin-bottom:8px" id="seatStatus"></div><button id="buy0">구매</button></div>
       <div class="card"><h3>🧹 청소 면제</h3><div class="price">가격: <span>10 코인</span></div><div style="font-size:.75rem;color:#f9a825;margin-bottom:8px" id="cleanStatus"></div><button id="buy1">구매</button></div>
       <div class="card"><h3>🛒 매점 1000원권</h3><div class="price">가격: <span>10 코인</span></div><button id="buy2">구매</button></div>
       <div class="card"><h3>🛒 매점 5000원권</h3><div class="price">가격: <span>50 코인</span></div><button id="buy3">구매</button></div>
@@ -578,10 +578,10 @@ async function buyExec(price, item) {
   if (isAdmin()) { alert('학생만 구매 가능해요'); return; }
   if (coins[si()] < price) { alert('코인이 부족해요 😢'); return; }
 
-  if (item === '자리 변경권') {
+  if (item === '자리 변경 우선권') {
     const buyers = await getSeatMonth();
-    if (buyers.includes(me)) { alert('이번 달 이미 자리 변경권을 구매했어요!'); return; }
-    if (buyers.length >= SEAT_LIMIT) { alert(`이번 달 자리 변경권은 마감됐어요!`); return; }
+    if (buyers.includes(me)) { alert('이번 달 이미 자리 변경 우선권을 구매했어요!'); return; }
+    if (buyers.length >= SEAT_LIMIT) { alert(`이번 달 자리 변경 우선권은 마감됐어요!`); return; }
     await saveSeatMonth([...buyers, me]);
   }
   if (item === '청소 면제') {
@@ -1139,7 +1139,7 @@ function bindEvents() {
   g('btnAskReset').onclick   = askReset;
   g('btnDoReset').onclick    = doReset;
   g('btnCancelReset').onclick = cancelReset;
-  g('buy0').onclick = () => buy(30,'자리 변경권');
+  g('buy0').onclick = () => buy(30,'자리 변경 우선권');
   g('buy1').onclick = () => buy(10,'청소 면제');
   g('buy2').onclick = () => buy(10,'매점 1000원권');
   g('buy3').onclick = () => buy(50,'매점 5000원권');

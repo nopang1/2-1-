@@ -41,6 +41,11 @@ button:active{transform:translateY(0)}
 .btn-y{background:linear-gradient(135deg,var(--gold-dark),var(--gold-light));color:#071a0e;box-shadow:0 3px 8px rgba(212,160,23,.35)}
 .btn-y:hover{box-shadow:0 5px 14px rgba(245,200,66,.5)}
 
+/* 로딩 화면 */
+#loadingPage{position:fixed;inset:0;background:#061608;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.spinner{width:48px;height:48px;border:4px solid var(--surface2);border-top:4px solid var(--gold-light);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 .login{max-width:400px;margin:80px auto;background:var(--surface);border:2px solid var(--green-mid);padding:36px;border-radius:16px;box-shadow:0 0 40px rgba(46,168,85,.2);text-align:center}
 .login h2{font-family:'Black Han Sans',sans-serif;color:var(--gold-light);margin-bottom:20px;font-size:1.4rem}
 .login input{display:block;width:85%;margin:0 auto 10px;background:var(--surface2);border:1px solid var(--green-mid);color:var(--text);padding:11px 16px;border-radius:8px;font-family:inherit;font-size:1rem;outline:none}
@@ -97,11 +102,9 @@ tr:hover td{background:rgba(46,168,85,.06)}
   animation:fadeIn .2s ease;display:flex;flex-direction:column;align-items:center;
   background:radial-gradient(ellipse at 50% 0%,#6b1200 0%,#3a0800 40%,#1a0300 100%)
 }
-/* 카지노 조명 */
 .slot-overlay::before,.slot-overlay::after{
   content:'';position:fixed;left:0;right:0;height:22px;pointer-events:none;z-index:1000;
-  background-repeat:repeat-x;
-  background-size:144px 22px;
+  background-repeat:repeat-x;background-size:144px 22px;
 }
 .slot-overlay::before{
   top:0;
@@ -138,13 +141,11 @@ tr:hover td{background:rgba(46,168,85,.06)}
 .bet-row input:focus{border-color:#ffd600;box-shadow:0 0 0 2px rgba(255,214,0,.2)}
 .btn-spin{background:linear-gradient(135deg,#b01208,#e8280b) !important;padding:11px 28px !important;font-size:1rem !important;border:1px solid #ffd600 !important;box-shadow:0 4px 16px rgba(192,22,14,.6) !important;border-radius:8px !important}
 
-/* ── 카지노 메뉴 광란 배경 ── */
 .rainbow-text{color:#ffd600;font-weight:900}
 @keyframes neonPulse{0%,100%{opacity:1;text-shadow:0 0 8px currentColor,0 0 20px currentColor,0 0 40px currentColor}50%{opacity:.7;text-shadow:0 0 4px currentColor,0 0 10px currentColor}}
 @keyframes marquee{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
 @keyframes bulbBlink{0%,100%{opacity:1}45%,55%{opacity:.15}}
 @keyframes floatChip{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(8deg)}}
-@keyframes scanline{0%{background-position:0 0}100%{background-position:0 100px}}
 .casino-bg{
   background:#000 !important;
   background-image:
@@ -210,7 +211,14 @@ tr:hover td{background:rgba(46,168,85,.06)}
 </head>
 <body>
 
-<div id="loginPage" class="login">
+<!-- 로딩 -->
+<div id="loadingPage">
+  <div style="font-family:'Black Han Sans',sans-serif;font-size:1.4rem;color:var(--gold-light)">🪙 2-1 학급 코인 상점</div>
+  <div class="spinner"></div>
+  <div style="color:var(--text-muted);font-size:.85rem">Firebase 연결 중...</div>
+</div>
+
+<div id="loginPage" class="login" style="display:none">
   <h2>🪙 2-1 학급 코인 상점</h2>
   <input id="loginId" placeholder="학생 번호 또는 관리자 ID">
   <input id="loginPw" type="password" placeholder="비밀번호">
@@ -248,6 +256,7 @@ tr:hover td{background:rgba(46,168,85,.06)}
       <button id="btnCasino" style="background:linear-gradient(135deg,#b01208,#e8280b);box-shadow:0 3px 8px rgba(192,22,14,.5)">🎮 <span class="rainbow-text">미니게임</span></button>
       <button id="btnBig" style="background:linear-gradient(135deg,#7a5500,#d4a017);box-shadow:0 3px 8px rgba(212,160,23,.5)">💰 소비 순위</button>
       <button id="btnHowTo" style="background:linear-gradient(135deg,#0a4a6b,#1a8ab4);box-shadow:0 3px 8px rgba(26,138,180,.5)">📖 코인 얻는법</button>
+      <button id="btnLogout" style="background:linear-gradient(135deg,#3a1a1a,#6a2a2a);box-shadow:0 3px 8px rgba(0,0,0,.4);margin-left:auto">🚪 로그아웃</button>
     </div>
     <div id="adminPanel" style="display:none">
       <h3>🔧 코인 수정</h3>
@@ -278,7 +287,7 @@ tr:hover td{background:rgba(46,168,85,.06)}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
         <h2 style="margin-bottom:0">📊 학급 코인 현황</h2>
         <div style="display:flex;gap:6px">
-          <button id="sortByNum" class="btn-y"  style="font-size:.78rem;padding:6px 14px">🔢 번호순</button>
+          <button id="sortByNum" class="btn-y" style="font-size:.78rem;padding:6px 14px">🔢 번호순</button>
           <button id="sortByCoin" style="font-size:.78rem;padding:6px 14px">🪙 코인순</button>
         </div>
       </div>
@@ -290,50 +299,38 @@ tr:hover td{background:rgba(46,168,85,.06)}
   </div>
 </div>
 
-<script>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, get, set, update, push, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ── 데이터 ────────────────────────────────────────────
+// ── Firebase 설정 ──────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyByQvi2x0ukSARLnrWV3fuJ1KrtQ6rlnhA",
+  authDomain: "coinstore-f204e.firebaseapp.com",
+  databaseURL: "https://coinstore-f204e-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "coinstore-f204e",
+  storageBucket: "coinstore-f204e.firebasestorage.app",
+  messagingSenderId: "671476356930",
+  appId: "1:671476356930:web:2babf65742f4244c7ddadb",
+  measurementId: "G-2BSNPWFLFQ"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ── 상수 ──────────────────────────────────────────────
 const ADMIN_ID = '관리자', ADMIN_PW = '1qksrlwoqn';
 const NAMES = ['곽선우','김대현','김민성','김민찬','김선규','김선율','김지호','김지후','김현우','박시후','박재준','박준교','박준서','박준호','손정우','손채운','신건','신윤송','오상준','유태민','이건우','이상헌','이상휘','이선준','이승준','이원찬','이지상','이지용','정찬영','정혁준','조민성','조현웅','주효찬','최유준','허준혁'];
-const coins     = JSON.parse(localStorage.getItem('bokCoins') || 'null') || Array(35).fill(0);
-localStorage.removeItem('bokPw');
-localStorage.removeItem('bokLogs');
-const passwords = {};
-const logs      = [];
+const CLEAN_LIMIT = 3, SEAT_LIMIT = 3;
 
-// ── 청소 면제 일일 제한 / 자리 변경권 월간 제한 ──────────
-const CLEAN_LIMIT = 3;
-const SEAT_LIMIT = 3;
-function getCleanToday() {
-  const today = new Date().toISOString().slice(0,10);
-  const saved = JSON.parse(localStorage.getItem('bokCleanLimit') || '{}');
-  if (saved.date !== today) return [];
-  return saved.buyers || [];
-}
-function saveCleanToday(buyers) {
-  const today = new Date().toISOString().slice(0,10);
-  localStorage.setItem('bokCleanLimit', JSON.stringify({date:today, buyers}));
-}
-function getSeatMonth() {
-  const now = new Date();
-  const month = now.toISOString().slice(0,7); // YYYY-MM
-  const saved = JSON.parse(localStorage.getItem('bokSeatLimit') || '{}');
-  if (saved.month !== month) return [];
-  return saved.buyers || [];
-}
-function saveSeatMonth(buyers) {
-  const month = new Date().toISOString().slice(0,7);
-  localStorage.setItem('bokSeatLimit', JSON.stringify({month, buyers}));
-}
-function getMonthRestockTime() {
-  const now = new Date();
-  const next = new Date(now.getFullYear(), now.getMonth()+1, 1);
-  const diff = next - now;
-  const d = Math.floor(diff / 86400000);
-  const h = Math.floor((diff % 86400000) / 3600000);
-  return `${d}일 ${h}시간 후 재입고`;
-}
-let me = null, slotSpinning = false;
+// ── 상태 ──────────────────────────────────────────────
+let me = null;
+let coins = Array(35).fill(0);
+let passwords = {};
+let logs = [];
+let slotSpinning = false;
+let sortOrder = 'num';
+let unsubCoins = null;
 
 // ── 유틸 ──────────────────────────────────────────────
 const g = id => document.getElementById(id);
@@ -344,31 +341,63 @@ const now = () => {
   const t = new Date();
   return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
 };
-function save() {
-  localStorage.setItem('bokCoins', JSON.stringify(coins));
-  localStorage.setItem('bokPw',    JSON.stringify(passwords));
-  localStorage.setItem('bokLogs',  JSON.stringify(logs));
+
+// ── Firebase 읽기/쓰기 ─────────────────────────────────
+async function fbGet(path) {
+  const snap = await get(ref(db, path));
+  return snap.exists() ? snap.val() : null;
 }
-function addLog(delta, user, item) {
-  const who = user === ADMIN_ID ? '관리자' : `${parseInt(user)}번 ${NAMES[parseInt(user)-1]}`;
-  logs.push({ delta, student: who, item, time: now() });
+async function fbSet(path, val) {
+  await set(ref(db, path), val);
+}
+async function fbUpdate(path, val) {
+  await update(ref(db, path), val);
+}
+async function fbPush(path, val) {
+  await push(ref(db, path), val);
 }
 
-// ── 페이지 ────────────────────────────────────────────
-function showPage(id) {
-  ['loginPage','signupPage','mainPage'].forEach(p => g(p).style.display = 'none');
-  g(id).style.display = 'block';
+// ── 실시간 구독 ────────────────────────────────────────
+function subscribeCoins() {
+  if (unsubCoins) off(ref(db, 'coins'));
+  onValue(ref(db, 'coins'), snap => {
+    if (snap.exists()) {
+      const data = snap.val();
+      for (let i = 0; i < 35; i++) coins[i] = data[i] ?? 0;
+    }
+    if (me && !isAdmin()) g('coins').textContent = coins[si()];
+    updateTable();
+  });
 }
-function updateSeatStatus() {
-  const el = g('seatStatus');
-  if (!el) return;
-  const buyers = getSeatMonth();
-  const remaining = SEAT_LIMIT - buyers.length;
-  const isBought = buyers.includes(me);
-  const restock = `<div style="color:#888;font-size:.7rem;margin-top:3px">🕐 ${getMonthRestockTime()}</div>`;
-  if (isBought) el.innerHTML = `<div>✅ 이번 달 구매 완료</div>${restock}`;
-  else if (remaining <= 0) el.innerHTML = `<div>❌ 이번 달 마감 (${SEAT_LIMIT}/${SEAT_LIMIT}명)</div>${restock}`;
-  else el.textContent = `⏳ 이번 달 남은 자리: ${remaining}/${SEAT_LIMIT}명`;
+
+// ── 청소/자리 제한 ─────────────────────────────────────
+async function getCleanToday() {
+  const today = new Date().toISOString().slice(0,10);
+  const data = await fbGet('limits/clean');
+  if (!data || data.date !== today) return [];
+  return data.buyers || [];
+}
+async function saveCleanToday(buyers) {
+  const today = new Date().toISOString().slice(0,10);
+  await fbSet('limits/clean', {date: today, buyers});
+}
+async function getSeatMonth() {
+  const month = new Date().toISOString().slice(0,7);
+  const data = await fbGet('limits/seat');
+  if (!data || data.month !== month) return [];
+  return data.buyers || [];
+}
+async function saveSeatMonth(buyers) {
+  const month = new Date().toISOString().slice(0,7);
+  await fbSet('limits/seat', {month, buyers});
+}
+function getMonthRestockTime() {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth()+1, 1);
+  const diff = next - now;
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  return `${d}일 ${h}시간 후 재입고`;
 }
 function getRestockTime() {
   const now = new Date();
@@ -379,10 +408,19 @@ function getRestockTime() {
   const m = Math.floor((diff % 3600000) / 60000);
   return `${h}시간 ${m}분 후 재입고`;
 }
-function updateCleanStatus() {
-  const el = g('cleanStatus');
-  if (!el) return;
-  const buyers = getCleanToday();
+async function updateSeatStatus() {
+  const el = g('seatStatus'); if (!el) return;
+  const buyers = await getSeatMonth();
+  const remaining = SEAT_LIMIT - buyers.length;
+  const isBought = buyers.includes(me);
+  const restock = `<div style="color:#888;font-size:.7rem;margin-top:3px">🕐 ${getMonthRestockTime()}</div>`;
+  if (isBought) el.innerHTML = `<div>✅ 이번 달 구매 완료</div>${restock}`;
+  else if (remaining <= 0) el.innerHTML = `<div>❌ 이번 달 마감 (${SEAT_LIMIT}/${SEAT_LIMIT}명)</div>${restock}`;
+  else el.textContent = `⏳ 이번 달 남은 자리: ${remaining}/${SEAT_LIMIT}명`;
+}
+async function updateCleanStatus() {
+  const el = g('cleanStatus'); if (!el) return;
+  const buyers = await getCleanToday();
   const remaining = CLEAN_LIMIT - buyers.length;
   const isBought = buyers.includes(me);
   const restock = `<div style="color:#888;font-size:.7rem;margin-top:3px">🕐 ${getRestockTime()}</div>`;
@@ -390,15 +428,57 @@ function updateCleanStatus() {
   else if (remaining <= 0) el.innerHTML = `<div>❌ 오늘 마감 (${CLEAN_LIMIT}/${CLEAN_LIMIT}명)</div>${restock}`;
   else el.textContent = `⏳ 오늘 남은 자리: ${remaining}/${CLEAN_LIMIT}명`;
 }
-function enterApp(user) {
+
+// ── 로그 ──────────────────────────────────────────────
+async function addLog(delta, user, item) {
+  const who = user === ADMIN_ID ? '관리자' : `${parseInt(user)}번 ${NAMES[parseInt(user)-1]}`;
+  await fbPush('logs', { delta, student: who, item, time: now() });
+}
+async function loadLogs() {
+  const data = await fbGet('logs');
+  if (!data) { logs = []; return; }
+  logs = Object.values(data);
+}
+
+// ── 페이지 전환 ────────────────────────────────────────
+function showPage(id) {
+  ['loginPage','signupPage','mainPage'].forEach(p => g(p).style.display = 'none');
+  g(id).style.display = id === 'loginPage' || id === 'signupPage' ? 'block' : 'block';
+}
+
+// ── 앱 진입 ────────────────────────────────────────────
+async function enterApp(user) {
   me = user;
   showPage('mainPage');
   g('adminPanel').style.display = isAdmin() ? 'flex' : 'none';
   g('userName').textContent = isAdmin() ? '관리자' : NAMES[si()];
   g('coins').textContent = isAdmin() ? '∞' : coins[si()];
+  subscribeCoins();
   updateTable();
-  updateCleanStatus();
-  updateSeatStatus();
+  await updateCleanStatus();
+  await updateSeatStatus();
+}
+
+// ── 초기 데이터 로드 ───────────────────────────────────
+async function initData() {
+  g('loadingPage').style.display = 'flex';
+  try {
+    // 코인
+    const coinData = await fbGet('coins');
+    if (coinData) {
+      for (let i = 0; i < 35; i++) coins[i] = coinData[i] ?? 0;
+    } else {
+      await fbSet('coins', Array(35).fill(0));
+    }
+    // 비밀번호
+    const pwData = await fbGet('passwords');
+    passwords = pwData || {};
+  } catch(e) {
+    console.error(e);
+    alert('Firebase 연결 실패. 콘솔을 확인해주세요.');
+  }
+  g('loadingPage').style.display = 'none';
+  showPage('loginPage');
 }
 
 // ── 인증 ──────────────────────────────────────────────
@@ -408,51 +488,66 @@ function checkPwLen() {
   h.style.color = pw.length < 4 ? '#ff7070' : '#4cdc78';
   h.textContent = pw.length < 4 ? `${pw.length}자 — 4자 이상 입력해 주세요` : `✓ ${pw.length}자`;
 }
-function signup() {
+async function signup() {
   const key = normKey(g('signupNum').value.trim());
   const pw1 = g('signupPw1').value, pw2 = g('signupPw2').value, err = g('signupErr');
   if (!key)           { err.textContent = '학생 번호는 1~35 사이여야 해요.'; return; }
   if (passwords[key]) { err.textContent = '이미 가입된 번호예요! 로그인해 주세요.'; return; }
   if (pw1.length < 4) { err.textContent = '비밀번호는 4자 이상이어야 해요.'; return; }
   if (pw1 !== pw2)    { err.textContent = '비밀번호가 일치하지 않아요.'; return; }
-  passwords[key] = pw1; save();
+  passwords[key] = pw1;
+  await fbSet(`passwords/${key}`, pw1);
   err.style.color = '#f5c842'; err.textContent = '가입 완료! 로그인해 주세요 🎉';
   setTimeout(() => { err.style.color = '#ff7070'; showPage('loginPage'); }, 1200);
 }
-function tryLogin() {
+async function tryLogin() {
   const id = g('loginId').value.trim(), pw = g('loginPw').value, err = g('loginErr');
   if (!id || !pw) { err.textContent = '아이디와 비밀번호를 입력해 주세요.'; return; }
   if (id === ADMIN_ID) {
     if (pw !== ADMIN_PW) { err.textContent = '비밀번호가 틀렸어요.'; return; }
-    enterApp(ADMIN_ID); return;
+    await enterApp(ADMIN_ID); return;
   }
   const key = normKey(id);
-  if (!key)                  { err.textContent = '올바른 학생 번호를 입력해 주세요.'; return; }
-  if (!passwords[key])       { err.textContent = '가입 내역이 없어요. 먼저 회원가입 해주세요.'; return; }
-  if (passwords[key] !== pw) { err.textContent = '비밀번호가 틀렸어요.'; return; }
-  enterApp(key);
+  if (!key) { err.textContent = '올바른 학생 번호를 입력해 주세요.'; return; }
+  // 최신 비밀번호 Firebase에서 확인
+  const fbPw = await fbGet(`passwords/${key}`);
+  if (!fbPw)       { err.textContent = '가입 내역이 없어요. 먼저 회원가입 해주세요.'; return; }
+  if (fbPw !== pw) { err.textContent = '비밀번호가 틀렸어요.'; return; }
+  passwords[key] = fbPw;
+  await enterApp(key);
+}
+function logout() {
+  me = null;
+  if (unsubCoins) { off(ref(db, 'coins')); unsubCoins = null; }
+  g('loginId').value = ''; g('loginPw').value = '';
+  g('loginErr').textContent = '';
+  showPage('loginPage');
 }
 
 // ── 관리자 ────────────────────────────────────────────
-function changeCoin() {
+async function changeCoin() {
   const key = normKey(g('adminNum').value), amt = Number(g('adminAmt').value);
   const reason = g('adminReason').value.trim() || '관리자 수정';
   if (!key || isNaN(amt)) { alert('올바른 값을 입력하세요'); return; }
-  coins[parseInt(key)-1] += amt;
-  addLog(amt, key, reason); save(); updateTable();
+  const idx = parseInt(key)-1;
+  coins[idx] += amt;
+  await fbSet(`coins/${idx}`, coins[idx]);
+  await addLog(amt, key, reason);
   g('adminReason').value = '';
-  alert(`${key}번 ${NAMES[parseInt(key)-1]} 코인 변경 완료 ✅`);
+  updateTable();
+  alert(`${key}번 ${NAMES[idx]} 코인 변경 완료 ✅`);
 }
-function askReset() {
+async function askReset() {
   const key = normKey(g('resetNum').value);
   if (!key) { g('resetMsg').textContent = '올바른 학생 번호를 입력하세요'; return; }
   g('resetMsg').textContent = '';
   g('resetConfirmMsg').textContent = `${key}번 ${NAMES[parseInt(key)-1]} 학생의 비밀번호를 초기화할까요?`;
   g('resetConfirm').style.display = 'block';
 }
-function doReset() {
+async function doReset() {
   const key = normKey(g('resetNum').value);
-  delete passwords[key]; save();
+  delete passwords[key];
+  await fbSet(`passwords/${key}`, null);
   g('resetConfirm').style.display = 'none'; g('resetNum').value = '';
   g('resetMsg').textContent = `${key}번 ${NAMES[parseInt(key)-1]} 초기화 완료 ✓`;
   setTimeout(() => { g('resetMsg').textContent = ''; }, 3000);
@@ -463,7 +558,6 @@ function cancelReset() { g('resetConfirm').style.display = 'none'; }
 function buy(price, item) {
   if (isAdmin()) { alert('학생만 구매 가능해요'); return; }
   if (coins[si()] < price) { alert('코인이 부족해요 😢'); return; }
-  // 커스텀 확인 모달
   const modal = document.createElement('div');
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center';
   modal.innerHTML = `
@@ -480,29 +574,34 @@ function buy(price, item) {
   modal.querySelector('#modalCancel').onclick  = () => document.body.removeChild(modal);
   modal.querySelector('#modalConfirm').onclick = () => { document.body.removeChild(modal); buyExec(price, item); };
 }
-function buyExec(price, item) {
+async function buyExec(price, item) {
   if (isAdmin()) { alert('학생만 구매 가능해요'); return; }
   if (coins[si()] < price) { alert('코인이 부족해요 😢'); return; }
 
   if (item === '자리 변경권') {
-    const buyers = getSeatMonth();
-    if (buyers.includes(me)) { alert('이번 달 이미 자리 변경권을 구매했어요! 다음 달에 다시 도전하세요 😅'); return; }
-    if (buyers.length >= SEAT_LIMIT) { alert(`이번 달 자리 변경권은 마감됐어요! (월 ${SEAT_LIMIT}명 한정) 다음 달에 다시 도전하세요 😢`); return; }
-    saveSeatMonth([...buyers, me]);
+    const buyers = await getSeatMonth();
+    if (buyers.includes(me)) { alert('이번 달 이미 자리 변경권을 구매했어요!'); return; }
+    if (buyers.length >= SEAT_LIMIT) { alert(`이번 달 자리 변경권은 마감됐어요!`); return; }
+    await saveSeatMonth([...buyers, me]);
   }
   if (item === '청소 면제') {
-    const buyers = getCleanToday();
-    if (buyers.includes(me)) { alert('오늘 이미 청소 면제를 구매했어요! 내일 다시 도전하세요 😅'); return; }
-    if (buyers.length >= CLEAN_LIMIT) { alert(`오늘 청소 면제는 마감됐어요! (일일 ${CLEAN_LIMIT}명 한정) 내일 다시 도전하세요 😢`); return; }
-    saveCleanToday([...buyers, me]);
+    const buyers = await getCleanToday();
+    if (buyers.includes(me)) { alert('오늘 이미 청소 면제를 구매했어요!'); return; }
+    if (buyers.length >= CLEAN_LIMIT) { alert(`오늘 청소 면제는 마감됐어요!`); return; }
+    await saveCleanToday([...buyers, me]);
   }
-  coins[si()] -= price; addLog(-price, me, item); save();
+  const idx = si();
+  coins[idx] -= price;
+  await fbSet(`coins/${idx}`, coins[idx]);
+  await addLog(-price, me, item);
   alert(`${item} 구매 완료 ✅`);
-  g('coins').textContent = coins[si()]; updateTable(); updateCleanStatus(); updateSeatStatus();
+  g('coins').textContent = coins[idx];
+  updateTable();
+  await updateCleanStatus();
+  await updateSeatStatus();
 }
 
 // ── 테이블 ────────────────────────────────────────────
-let sortOrder = 'num';
 function setSortOrder(order) {
   sortOrder = order;
   g('sortByNum').className  = order === 'num'  ? 'btn-y' : '';
@@ -528,7 +627,8 @@ function renderLogs(list) {
     </div>`;
   }).join('');
 }
-function goToLogPage() {
+async function goToLogPage() {
+  await loadLogs();
   const myName = isAdmin() ? null : `${parseInt(me)}번 ${NAMES[si()]}`;
   const filtered = isAdmin() ? logs : logs.filter(e => e.student === myName);
   const ov = document.createElement('div');
@@ -543,7 +643,7 @@ function goToLogPage() {
       <input id="logSearch" placeholder="번호 또는 이름 검색"
         style="flex:1;min-width:200px;max-width:360px;padding:10px 14px;background:var(--surface2);border:1px solid var(--green-mid);color:var(--text);border-radius:8px;font-family:inherit;font-size:.9rem;outline:none">
       <button id="logSearchBtn" class="btn-y" style="font-size:.85rem;padding:9px 16px">🔍 검색</button>
-      <button id="logResetBtn"               style="font-size:.85rem;padding:9px 16px">전체 보기</button>
+      <button id="logResetBtn" style="font-size:.85rem;padding:9px 16px">전체 보기</button>
     </div>` : ''}
     <div class="log-cards" id="logCards">${renderLogs(filtered)}</div>`;
   document.body.appendChild(ov);
@@ -560,14 +660,12 @@ function goToLogPage() {
   }
 }
 
-// ── 명예의 전당 ───────────────────────────────────────
-function goToBigSpenders() {
-  const bigLogs = logs.filter(e => e.student !== '관리자' && e.item !== '관리자 수정' && (e.item.startsWith('슬롯') || e.item.startsWith('룰렛') || e.delta <= -50));
+// ── 소비 순위 ─────────────────────────────────────────
+async function goToBigSpenders() {
+  await loadLogs();
   const spendMap = {};
   logs.forEach(e => {
     if (e.delta < 0 && e.student !== '관리자' && e.item !== '관리자 수정')
-      spendMap[e.student] = (spendMap[e.student] || 0) + Math.abs(e.delta);
-    else if ((e.item && (e.item.startsWith('슬롯') || e.item.startsWith('룰렛'))) && e.student !== '관리자')
       spendMap[e.student] = (spendMap[e.student] || 0) + Math.abs(e.delta);
   });
   const fullRanking = Object.entries(spendMap).sort((a, b) => b[1] - a[1]);
@@ -577,22 +675,21 @@ function goToBigSpenders() {
   const colors  = ['#ffd600','#c0c0c0','#cd7f32'];
   const heights = ['120px','90px','75px'];
   const bgs     = ['linear-gradient(160deg,#3a2800,#6b4c00)','linear-gradient(160deg,#2a2a2a,#444)','linear-gradient(160deg,#2a1800,#5a3010)'];
-
   const medalSizes  = ['4rem','3rem','2.6rem'];
   const medalGlows  = ['0 0 20px rgba(255,214,0,.8)','0 0 14px rgba(192,192,192,.6)','0 0 12px rgba(205,127,50,.5)'];
+
   const podiumHTML = ranking.length ? `
     <div style="max-width:600px;margin:0 auto 36px;text-align:center">
-      <h3 style="font-family:'Black Han Sans',sans-serif;color:var(--gold-light);font-size:1.1rem;margin-bottom:28px;text-shadow:0 0 12px rgba(212,160,23,.5)">💰 코인 소비 순위 💰</h3>
+      <h3 style="font-family:'Black Han Sans',sans-serif;color:var(--gold-light);font-size:1.1rem;margin-bottom:28px">💰 코인 소비 순위 💰</h3>
       <div style="display:flex;align-items:flex-end;justify-content:center;gap:16px">
         ${[1,0,2].filter(i => ranking[i]).map((i,order) => `
           <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
             <div class="podium-medal" style="font-size:${medalSizes[i]};filter:drop-shadow(${medalGlows[i]});animation-delay:${[0.8,1.4,0.2][order]}s">${medals[i]}</div>
-            <div class="podium-name" style="font-size:${i===0?'1rem':'.88rem'};font-weight:800;color:${colors[i]};max-width:90px;text-align:center;word-break:keep-all;text-shadow:0 0 8px ${colors[i]};animation-delay:${[1.0,1.6,0.4][order]}s">${ranking[i][0].split('번 ')[1]||ranking[i][0]}</div>
+            <div class="podium-name" style="font-size:${i===0?'1rem':'.88rem'};font-weight:800;color:${colors[i]};max-width:90px;text-align:center;word-break:keep-all;animation-delay:${[1.0,1.6,0.4][order]}s">${ranking[i][0].split('번 ')[1]||ranking[i][0]}</div>
             <div class="podium-name" style="font-size:.75rem;color:${colors[i]};opacity:.85;animation-delay:${[1.1,1.7,0.5][order]}s">${ranking[i][1]}코인</div>
-            <div class="podium-bar" style="width:${['110px','90px','80px'][i]};height:${heights[i]};background:${bgs[i]};border:2px solid ${colors[i]};border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:1.4rem;color:${colors[i]};box-shadow:0 0 18px ${colors[i]}44;animation-delay:${[0.6,1.2,0][order]}s">${i+1}위</div>
+            <div class="podium-bar" style="width:${['110px','90px','80px'][i]};height:${heights[i]};background:${bgs[i]};border:2px solid ${colors[i]};border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-family:'Black Han Sans',sans-serif;font-size:1.4rem;color:${colors[i]};animation-delay:${[0.6,1.2,0][order]}s">${i+1}위</div>
           </div>`).join('')}
       </div>
-      <div style="height:4px;background:linear-gradient(90deg,var(--surface2),var(--gold),var(--surface2));border-radius:2px;max-width:320px;margin:0 auto"></div>
     </div>` : '';
 
   const ov = document.createElement('div');
@@ -605,20 +702,18 @@ function goToBigSpenders() {
     ${podiumHTML}
     ${restRanking.length ? `
     <div style="max-width:600px;margin:0 auto 36px">
-      <div style="background:var(--surface);border:2px solid var(--gold);border-radius:12px;overflow-y:auto;max-height:250px;scrollbar-width:thin;scrollbar-color:#d4a017 #152e1e">
+      <div style="background:var(--surface);border:2px solid var(--gold);border-radius:12px;overflow-y:auto;max-height:250px">
         ${restRanking.map(([name, coin], idx) => `
-          <div style="display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--surface2);${idx===restRanking.length-1?'border-bottom:none':''}">
+          <div style="display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid var(--surface2)">
             <span style="font-family:'Black Han Sans',sans-serif;color:var(--text-muted);font-size:.9rem;min-width:32px">${idx+4}위</span>
             <span style="font-weight:800;flex:1">${name}</span>
             <span style="color:var(--gold-light);font-weight:800">${coin}코인</span>
           </div>`).join('')}
       </div>
-    </div>` : ''}
-  `;
+    </div>` : ''}`;
   document.body.appendChild(ov);
   ov.querySelector('#bigBack').onclick = () => document.body.removeChild(ov);
 }
-
 
 // ── 코인 얻는법 ───────────────────────────────────────
 function goToHowTo() {
@@ -654,19 +749,20 @@ function goToHowTo() {
   document.body.appendChild(ov);
   ov.querySelector('#howtoBack').onclick = () => document.body.removeChild(ov);
 }
+
 // ── 카지노 메뉴 ───────────────────────────────────────
 function goToCasino() {
   const ov = document.createElement('div');
   ov.className = 'slot-overlay casino-bg';
   ov.innerHTML = `
     <div style="position:fixed;top:12px;left:16px;z-index:1001">
-      <button id="casinoBack" style="background:linear-gradient(135deg,#8a0a04,#c0160e);color:#ffd600;border:2px solid #ffd600;font-weight:800;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:inherit;box-shadow:0 0 12px rgba(255,50,0,.5)">← 나가기</button>
+      <button id="casinoBack" style="background:linear-gradient(135deg,#8a0a04,#c0160e);color:#ffd600;border:2px solid #ffd600;font-weight:800;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:inherit">← 나가기</button>
     </div>
     <div style="height:20px"></div>
     <div class="casino-neon-title">🎮 미니게임 🎮</div>
     <div class="casino-sub">⚡ COIN MINIGAMES ⚡</div>
     <div class="casino-marquee-wrap">
-      <span class="casino-marquee">🎰 슬롯머신 최대 ×7 &nbsp;•&nbsp; 🎡 룰렛 최대 ×10 &nbsp;•&nbsp; 🍀 행운을 빕니다! &nbsp;•&nbsp; 💰 대박 나세요! &nbsp;•&nbsp; 🎯 지금 바로 도전! &nbsp;•&nbsp; 🔥 오늘의 승자는 누구? &nbsp;•&nbsp; 🃏 운명을 시험하라! &nbsp;•&nbsp; 🎰 슬롯머신 최대 ×7 &nbsp;•&nbsp; 🎡 룰렛 최대 ×10 &nbsp;•&nbsp;</span>
+      <span class="casino-marquee">🎰 슬롯머신 최대 ×7 &nbsp;•&nbsp; 🎡 룰렛 최대 ×10 &nbsp;•&nbsp; 🍀 행운을 빕니다! &nbsp;•&nbsp; 💰 대박 나세요! &nbsp;•&nbsp; 🎯 지금 바로 도전! &nbsp;•&nbsp; 🔥 오늘의 승자는 누구? &nbsp;•&nbsp;</span>
     </div>
     <div style="width:100%;max-width:460px;display:flex;flex-direction:column;gap:16px;margin-top:8px">
       <div class="casino-card">
@@ -707,16 +803,15 @@ function goToSlotPage() {
   ov.className = 'slot-overlay casino-bg';
   ov.innerHTML = `
     <div style="position:fixed;top:12px;left:16px;z-index:1001">
-      <button id="slotBack" style="background:linear-gradient(135deg,#8a0a04,#c0160e);color:#ffd600;border:2px solid #ffd600;font-weight:800;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:inherit;box-shadow:0 0 12px rgba(255,50,0,.5)">← 뒤로가기</button>
+      <button id="slotBack" style="background:linear-gradient(135deg,#8a0a04,#c0160e);color:#ffd600;border:2px solid #ffd600;font-weight:800;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:inherit">← 뒤로가기</button>
     </div>
     <div style="height:20px"></div>
     <div class="casino-neon-title" style="font-size:1.8rem">🎰 SLOT MACHINE 🎰</div>
     <div class="casino-sub" style="margin-bottom:14px">최대 ×7</div>
     <div class="casino-marquee-wrap" style="margin-bottom:16px">
-      <span class="casino-marquee">🍒×2 &nbsp;•&nbsp; 🍋×3 &nbsp;•&nbsp; 🍇×4 &nbsp;•&nbsp; 🍊×5 &nbsp;•&nbsp; ⭐×6 &nbsp;•&nbsp; 7️⃣×7 &nbsp;•&nbsp; 🎯 3개 일치 시 배율 획득! &nbsp;•&nbsp; 🔁 2개 일치 시 원금 환불 &nbsp;•&nbsp; 💨 모두 다름 절반 환불 &nbsp;•&nbsp; 🍒×2 &nbsp;•&nbsp; 🍋×3 &nbsp;•&nbsp; 🍇×4 &nbsp;•&nbsp;</span>
+      <span class="casino-marquee">🍒×2 &nbsp;•&nbsp; 🍋×3 &nbsp;•&nbsp; 🍇×4 &nbsp;•&nbsp; 🍊×5 &nbsp;•&nbsp; ⭐×6 &nbsp;•&nbsp; 7️⃣×7 &nbsp;•&nbsp; 🎯 3개 일치 시 배율 획득! &nbsp;•&nbsp; 🔁 2개 일치 시 원금 환불 &nbsp;•&nbsp;</span>
     </div>
     <div class="slot-box">
-      <h2 style="display:none">🎰 SLOT MACHINE</h2>
       <div class="odds-table" style="background:rgba(0,0,0,.6);border:1px solid rgba(255,50,0,.3)">
         <div class="odds-row"><span>🍒 체리</span><b>× 2</b></div>
         <div class="odds-row"><span>🍋 레몬</span><b>× 3</b></div>
@@ -746,7 +841,7 @@ function goToSlotPage() {
     </div>`;
   document.body.appendChild(ov);
   ov.querySelector('#slotBack').onclick = () => { slotSpinning = false; document.body.removeChild(ov); };
-  ov.querySelector('#spinBtn').onclick = () => {
+  ov.querySelector('#spinBtn').onclick = async () => {
     if (slotSpinning) return;
     const bet = parseInt(ov.querySelector('#slotBet').value);
     const res = ov.querySelector('#slotRes');
@@ -755,7 +850,7 @@ function goToSlotPage() {
     if (isNaN(bet) || bet < 1)  { res.style.color='#ff7070'; res.textContent='베팅 코인을 입력해 주세요!'; return; }
     if (!adm && bet > coins[i]) { res.style.color='#ff7070'; res.textContent='코인이 부족해요 😢'; return; }
     slotSpinning = true;
-    if (!adm) coins[i] -= bet;
+    if (!adm) { coins[i] -= bet; await fbSet(`coins/${i}`, coins[i]); }
     coinsEl.textContent = adm?'∞':coins[i]; g('coins').textContent = adm?'∞':coins[i]; updateTable();
     res.style.color = '#e09070'; res.textContent = '🎰 돌리는 중...';
     const reels = [ov.querySelector('#r0'), ov.querySelector('#r1'), ov.querySelector('#r2')];
@@ -766,31 +861,31 @@ function goToSlotPage() {
       if (++tick > 15) {
         clearInterval(timer);
         reels[0].textContent = results[0];
-        setTimeout(() => {
+        setTimeout(async () => {
           reels[1].textContent = results[1];
-          setTimeout(() => {
+          setTimeout(async () => {
             reels[2].textContent = results[2];
             const allSame = results[0]===results[1] && results[1]===results[2];
             const twoSame = !allSame && (results[0]===results[1] || results[1]===results[2] || results[0]===results[2]);
             const sym = results.join('');
-            addLog(-bet, me, `슬롯 ${sym}`);
+            await addLog(-bet, me, `슬롯 ${sym}`);
             if (allSame) {
               const mult = S_PAY[results[0]], won = Math.floor(bet*mult), net = won-bet;
-              if (!adm) coins[i] += won;
+              if (!adm) { coins[i] += won; await fbSet(`coins/${i}`, coins[i]); }
               coinsEl.textContent=adm?'∞':coins[i]; g('coins').textContent=adm?'∞':coins[i]; updateTable();
               res.style.color='#ffd600';
               res.textContent = results[0]==='7️⃣' ? `🎉 럭키세븐! +${net} 코인 (×7)` : `✨ ${results[0]} 3개! +${net} 코인 (×${mult})`;
             } else if (twoSame) {
-              if (!adm) coins[i] += bet;
+              if (!adm) { coins[i] += bet; await fbSet(`coins/${i}`, coins[i]); }
               coinsEl.textContent=adm?'∞':coins[i]; g('coins').textContent=adm?'∞':coins[i]; updateTable();
               res.style.color='#f9a825'; res.textContent=`🔁 2개 일치! ${bet} 코인 환불`;
             } else {
               const refund = Math.floor(bet/2);
-              if (!adm) coins[i] += refund;
+              if (!adm) { coins[i] += refund; await fbSet(`coins/${i}`, coins[i]); }
               coinsEl.textContent=adm?'∞':coins[i]; g('coins').textContent=adm?'∞':coins[i]; updateTable();
               res.style.color='#ff7070'; res.textContent=`💨 꽝! ${refund} 코인 환불`;
             }
-            save(); slotSpinning = false;
+            slotSpinning = false;
           }, 250);
         }, 250);
       }
@@ -798,7 +893,7 @@ function goToSlotPage() {
   };
 }
 
-// ── 룰렛 캔버스 ───────────────────────────────────────
+// ── 룰렛 ──────────────────────────────────────────────
 const WHEEL_NUMS = (() => {
   const base = [
     {n:32,c:'red'},{n:15,c:'black'},{n:19,c:'red'},{n:4,c:'black'},
@@ -812,22 +907,17 @@ const WHEEL_NUMS = (() => {
     {n:12,c:'red'},{n:35,c:'black'},{n:3,c:'red'},{n:26,c:'black'}
   ];
   const flipped = base.map(s => ({n:s.n, c: s.c==='red'?'black':'red'}));
-  // 0(초록)을 앞 36칸과 뒤 36칸 사이에 삽입 → 총 73칸
   return [...base, {n:0,c:'green'}, ...flipped];
 })();
-
 function getRange(n) { if (n<=12) return 1; if (n<=24) return 2; return 3; }
-
 function drawWheel(canvas, angle) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width, cx = W/2, cy = W/2, R = W/2-4;
   const n = WHEEL_NUMS.length, sliceAngle = 2*Math.PI/n;
   ctx.clearRect(0, 0, W, W);
-
   const woodGrad = ctx.createRadialGradient(cx,cy,R*0.82,cx,cy,R);
   woodGrad.addColorStop(0,'#8B4513'); woodGrad.addColorStop(0.4,'#A0522D'); woodGrad.addColorStop(1,'#5C2E00');
   ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.fillStyle=woodGrad; ctx.fill();
-
   for (let i = 0; i < n; i++) {
     const {n: num, c} = WHEEL_NUMS[i];
     const a = angle + i*sliceAngle;
@@ -839,20 +929,16 @@ function drawWheel(canvas, angle) {
     ctx.fillStyle='white'; ctx.font=`bold ${R*0.075}px Arial`;
     ctx.fillText(num, R*0.66, 0); ctx.restore();
   }
-
   const goldGrad = ctx.createRadialGradient(cx-8,cy-8,2,cx,cy,R*0.42);
   goldGrad.addColorStop(0,'#ffe066'); goldGrad.addColorStop(0.5,'#c8960c'); goldGrad.addColorStop(1,'#7a5500');
   ctx.beginPath(); ctx.arc(cx,cy,R*0.42,0,2*Math.PI); ctx.fillStyle=goldGrad; ctx.fill();
   ctx.strokeStyle='#ffd600'; ctx.lineWidth=3; ctx.stroke();
-
   const bossGrad = ctx.createRadialGradient(cx-4,cy-4,2,cx,cy,R*0.14);
   bossGrad.addColorStop(0,'#ffe066'); bossGrad.addColorStop(0.6,'#b8860b'); bossGrad.addColorStop(1,'#5a3e00');
   ctx.beginPath(); ctx.arc(cx,cy,R*0.13,0,2*Math.PI); ctx.fillStyle=bossGrad; ctx.fill();
   ctx.strokeStyle='#ffd600'; ctx.lineWidth=2; ctx.stroke();
-
   ctx.beginPath(); ctx.arc(cx,cy,R,0,2*Math.PI); ctx.strokeStyle='#ffd600'; ctx.lineWidth=4; ctx.stroke();
 }
-
 function drawBall(ballCanvas, ballAngle, ballR) {
   const ctx = ballCanvas.getContext('2d');
   const W = ballCanvas.width, cx = W/2, cy = W/2, R = W/2-4;
@@ -864,7 +950,6 @@ function drawBall(ballCanvas, ballAngle, ballR) {
   bGrad.addColorStop(0,'#ffffff'); bGrad.addColorStop(0.3,'#e0e0e0'); bGrad.addColorStop(1,'#888');
   ctx.beginPath(); ctx.arc(bx,by,size,0,2*Math.PI); ctx.fillStyle=bGrad; ctx.fill();
 }
-
 function spinRoulette(ov, onDone) {
   const wCv = ov.querySelector('#rCanvas'), bCv = ov.querySelector('#rBallCanvas');
   const W = wCv.width, R = W/2-4, n = WHEEL_NUMS.length, sliceAngle = 2*Math.PI/n;
@@ -894,8 +979,6 @@ function spinRoulette(ov, onDone) {
   }
   requestAnimationFrame(frame);
 }
-
-// ── 룰렛 UI ───────────────────────────────────────────
 function goToRoulette() {
   const adm = isAdmin();
   let numBtns = '';
@@ -909,21 +992,19 @@ function goToRoulette() {
     numBtns += '</div></div>';
     if (ri < 2) numBtns += '<div style="border-top:1px dashed rgba(255,180,0,.2);margin:4px 0 6px"></div>';
   });
-
   const ov = document.createElement('div');
   ov.className = 'slot-overlay casino-bg';
   ov.innerHTML = `
     <div style="position:fixed;top:12px;left:16px;z-index:1001">
-      <button id="rBack" style="background:linear-gradient(135deg,#8a0a04,#c0160e);color:#ffd600;border:2px solid #ffd600;font-weight:800;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:inherit;box-shadow:0 0 12px rgba(255,50,0,.5)">← 뒤로가기</button>
+      <button id="rBack" style="background:linear-gradient(135deg,#8a0a04,#c0160e);color:#ffd600;border:2px solid #ffd600;font-weight:800;padding:10px 18px;border-radius:8px;cursor:pointer;font-family:inherit">← 뒤로가기</button>
     </div>
     <div style="height:20px"></div>
     <div class="casino-neon-title" style="font-size:1.8rem">🎡 ROULETTE 🎡</div>
     <div class="casino-sub" style="margin-bottom:14px">최대 ×10</div>
     <div class="casino-marquee-wrap" style="margin-bottom:16px">
-      <span class="casino-marquee">🎯 숫자+색 ×10 &nbsp;•&nbsp; 🔢 숫자만 ×5 &nbsp;•&nbsp; 🟢 0 적중 ×3 &nbsp;•&nbsp; 🎨 색+범위 ×2 &nbsp;•&nbsp; 🎨 색만 절반환불 &nbsp;•&nbsp; ❌ 나머지 꽝 &nbsp;•&nbsp; 🎯 숫자+색 ×10 &nbsp;•&nbsp; 🔢 숫자만 ×5 &nbsp;•&nbsp;</span>
+      <span class="casino-marquee">🎯 숫자+색 ×10 &nbsp;•&nbsp; 🔢 숫자만 ×5 &nbsp;•&nbsp; 🟢 0 적중 ×3 &nbsp;•&nbsp; 🎨 색+범위 ×2 &nbsp;•&nbsp; 🎨 색만 절반환불 &nbsp;•&nbsp; ❌ 나머지 꽝 &nbsp;•&nbsp;</span>
     </div>
     <div class="slot-box">
-      <h2 style="display:none">🎡 ROULETTE</h2>
       <div class="odds-table" style="margin-bottom:20px;background:rgba(0,0,0,.6);border:1px solid rgba(255,50,0,.3)">
         <div class="odds-row"><span>🎯 숫자 + 색 모두 일치</span><b>× 10</b></div>
         <div class="odds-row"><span>🔢 숫자만 일치</span><b>× 5</b></div>
@@ -959,7 +1040,6 @@ function goToRoulette() {
   drawWheel(ov.querySelector('#rCanvas'), 0);
 
   let pickedColor = null, pickedNum = null, rSpinning = false;
-
   function updateSelected() {
     const el = ov.querySelector('#rSelected');
     const cs = pickedColor===null ? '색 미선택' : pickedColor==='red' ? '🔴 빨강' : '⚫ 검정';
@@ -967,7 +1047,6 @@ function goToRoulette() {
     el.textContent = '선택: '+cs+' / '+ns;
     el.style.color = (pickedColor && pickedNum!==null) ? '#ffd600' : '#d4907a';
   }
-
   function setColor(c) {
     pickedColor = c;
     ['pickRed','pickBlack'].forEach(id => {
@@ -976,18 +1055,11 @@ function goToRoulette() {
     });
     const sel = ov.querySelector(c==='red' ? '#pickRed' : '#pickBlack');
     sel.style.borderColor='#ffd600'; sel.style.color='white';
-    ov.querySelectorAll('.rnum-btn').forEach(b => {
-      if (b.style.outline === '2px solid rgb(255, 214, 0)') return;
-      b.style.borderColor = c==='red' ? '#c0160e' : '#555';
-      b.style.background  = c==='red' ? '#6b0000' : '#1a1a1a';
-    });
     updateSelected();
   }
-
-  ov.querySelector('#pickRed').onclick    = () => setColor('red');
-  ov.querySelector('#pickBlack').onclick   = () => setColor('black');
-  ov.querySelector('#rBack').onclick       = () => document.body.removeChild(ov);
-
+  ov.querySelector('#pickRed').onclick   = () => setColor('red');
+  ov.querySelector('#pickBlack').onclick = () => setColor('black');
+  ov.querySelector('#rBack').onclick     = () => document.body.removeChild(ov);
   ov.querySelectorAll('.rnum-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       pickedNum = parseInt(this.dataset.n);
@@ -996,75 +1068,76 @@ function goToRoulette() {
       updateSelected();
     });
   });
-
-  ov.querySelector('#rSpinBtn').onclick = () => {
+  ov.querySelector('#rSpinBtn').onclick = async () => {
     if (rSpinning) return;
     const res = ov.querySelector('#rResult'), bet = parseInt(ov.querySelector('#rBet').value);
     const i = adm ? 0 : si();
-    if (pickedColor===null)        { res.style.color='#ff7070'; res.textContent='색을 선택해 주세요!'; return; }
-    if (pickedNum===null)          { res.style.color='#ff7070'; res.textContent='숫자를 선택해 주세요!'; return; }
-    if (isNaN(bet)||bet<1)         { res.style.color='#ff7070'; res.textContent='베팅 코인을 입력해 주세요!'; return; }
-    if (!adm && bet>coins[i])      { res.style.color='#ff7070'; res.textContent='코인이 부족해요 😢'; return; }
+    if (pickedColor===null)   { res.style.color='#ff7070'; res.textContent='색을 선택해 주세요!'; return; }
+    if (pickedNum===null)     { res.style.color='#ff7070'; res.textContent='숫자를 선택해 주세요!'; return; }
+    if (isNaN(bet)||bet<1)    { res.style.color='#ff7070'; res.textContent='베팅 코인을 입력해 주세요!'; return; }
+    if (!adm && bet>coins[i]) { res.style.color='#ff7070'; res.textContent='코인이 부족해요 😢'; return; }
     rSpinning = true;
-    if (!adm) coins[i] -= bet;
+    if (!adm) { coins[i] -= bet; await fbSet(`coins/${i}`, coins[i]); }
     ov.querySelector('#rCoins').textContent = adm?'∞':coins[i];
     g('coins').textContent = adm?'∞':coins[i]; updateTable();
     res.style.color='#e09070'; res.textContent='🎡 돌리는 중...';
-    spinRoulette(ov, (landedNum, landedColor) => {
+    spinRoulette(ov, async (landedNum, landedColor) => {
       const numMatch   = pickedNum === landedNum;
       const colorMatch = pickedColor === landedColor;
       const sameRange  = getRange(pickedNum) === getRange(landedNum);
       const emoji  = landedColor==='red' ? '🔴' : landedColor==='green' ? '🟢' : '⚫';
       const detail = emoji+(landedNum===0?'0':landedNum+'번');
-      addLog(-bet, me, `룰렛 ${detail}`);
+      await addLog(-bet, me, `룰렛 ${detail}`);
       if (landedColor === 'green') {
         const net = Math.floor(bet*3)-bet;
-        if (!adm) coins[i] += Math.floor(bet*3);
+        if (!adm) { coins[i] += Math.floor(bet*3); await fbSet(`coins/${i}`, coins[i]); }
         res.style.color='#4cdc78'; res.textContent=`🍀 0 당첨! +${net} 코인 (×3) | ${detail}`;
       } else if (numMatch && colorMatch) {
         const net = Math.floor(bet*10)-bet;
-        if (!adm) coins[i] += Math.floor(bet*10);
+        if (!adm) { coins[i] += Math.floor(bet*10); await fbSet(`coins/${i}`, coins[i]); }
         res.style.color='#ffd600'; res.textContent=`🎉 완벽 적중! +${net} 코인 (×10) | ${detail}`;
       } else if (numMatch) {
         const net = Math.floor(bet*5)-bet;
-        if (!adm) coins[i] += Math.floor(bet*5);
+        if (!adm) { coins[i] += Math.floor(bet*5); await fbSet(`coins/${i}`, coins[i]); }
         res.style.color='#f5c842'; res.textContent=`✨ 숫자 적중! +${net} 코인 (×5) | ${detail}`;
       } else if (colorMatch && sameRange) {
         const net = bet;
-        if (!adm) coins[i] += bet*2;
+        if (!adm) { coins[i] += bet*2; await fbSet(`coins/${i}`, coins[i]); }
         res.style.color='#f9a825'; res.textContent=`✨ 색+범위 일치! +${net} 코인 (×2) | ${detail}`;
       } else if (colorMatch) {
         const refund = Math.floor(bet/2);
-        if (!adm) coins[i] += refund;
+        if (!adm) { coins[i] += refund; await fbSet(`coins/${i}`, coins[i]); }
         res.style.color='#f9a825'; res.textContent=`🔁 색 일치! ${refund} 코인 반환 | ${detail}`;
       } else {
         res.style.color='#ff7070'; res.textContent=`😢 꽝! -${bet} 코인 | ${detail}`;
       }
       ov.querySelector('#rCoins').textContent = adm?'∞':coins[i];
       g('coins').textContent = adm?'∞':coins[i];
-      updateTable(); save(); rSpinning = false;
+      updateTable(); rSpinning = false;
     });
   };
 }
-// ── 이벤트 바인딩 ────────────────────────────────────
+
+// ── 이벤트 바인딩 ─────────────────────────────────────
 function bindEvents() {
-  g('loginBtn').onclick    = tryLogin;
-  g('goSignup').onclick    = () => showPage('signupPage');
-  g('signupBtn').onclick   = signup;
-  g('goLogin').onclick     = () => showPage('loginPage');
-  g('signupPw1').oninput   = checkPwLen;
-  g('loginId').onkeydown   = e => { if(e.key==='Enter') g('loginPw').focus(); };
-  g('loginPw').onkeydown   = e => { if(e.key==='Enter') tryLogin(); };
-  g('signupNum').onkeydown = e => { if(e.key==='Enter') g('signupPw1').focus(); };
-  g('signupPw1').onkeydown = e => { if(e.key==='Enter') g('signupPw2').focus(); };
-  g('signupPw2').onkeydown = e => { if(e.key==='Enter') signup(); };
-  g('btnLog').onclick      = goToLogPage;
-  g('btnCasino').onclick   = goToCasino;
-  g('btnBig').onclick      = goToBigSpenders;
-  g('btnHowTo').onclick    = goToHowTo;
+  g('loginBtn').onclick      = tryLogin;
+  g('goSignup').onclick      = () => showPage('signupPage');
+  g('signupBtn').onclick     = signup;
+  g('goLogin').onclick       = () => showPage('loginPage');
+  g('signupPw1').oninput     = checkPwLen;
+  g('loginId').onkeydown     = e => { if(e.key==='Enter') g('loginPw').focus(); };
+  g('loginPw').onkeydown     = e => { if(e.key==='Enter') tryLogin(); };
+  g('signupNum').onkeydown   = e => { if(e.key==='Enter') g('signupPw1').focus(); };
+  g('signupPw1').onkeydown   = e => { if(e.key==='Enter') g('signupPw2').focus(); };
+  g('signupPw2').onkeydown   = e => { if(e.key==='Enter') signup(); };
+  g('btnLog').onclick        = goToLogPage;
+  g('btnCasino').onclick     = goToCasino;
+  g('btnBig').onclick        = goToBigSpenders;
+  g('btnHowTo').onclick      = goToHowTo;
+  g('btnLogout').onclick     = logout;
   g('btnChangeCoin').onclick = changeCoin;
-  g('btnAskReset').onclick = askReset;
-  g('btnDoReset').onclick  = doReset;
+  g('btnAskReset').onclick   = askReset;
+  g('btnDoReset').onclick    = doReset;
   g('btnCancelReset').onclick = cancelReset;
   g('buy0').onclick = () => buy(30,'자리 변경권');
   g('buy1').onclick = () => buy(10,'청소 면제');
@@ -1075,7 +1148,8 @@ function bindEvents() {
 }
 
 // ── 시작 ──────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded", () => { bindEvents(); });
+bindEvents();
+await initData();
 </script>
 </body>
 </html>

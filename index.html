@@ -1146,7 +1146,9 @@ function goToChat() {
         </div>` : '<div style="text-align:center;color:var(--text-muted);font-size:.82rem;padding:8px">공지는 관리자만 작성할 수 있어요</div>'}
       </div>
       <div id="panelFree" style="display:none">
-        <div id="freeList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;min-height:80px"></div>
+        <div id="freeScroll" style="height:420px;overflow-y:auto;background:var(--surface);border:2px solid var(--surface2);border-radius:12px;padding:14px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:var(--green-mid) var(--surface2)">
+          <div id="freeList" style="display:flex;flex-direction:column;gap:10px"></div>
+        </div>
         <div style="background:var(--surface);border:2px solid var(--green-mid);border-radius:12px;padding:16px">
           <div style="color:var(--green-light);font-weight:800;font-size:.9rem;margin-bottom:10px">✏️ 글 작성</div>
           <textarea id="freeInput" placeholder="자유롭게 의견을 남겨보세요..." style="width:100%;min-height:80px;background:var(--surface2);border:1px solid var(--green-mid);color:var(--text);border-radius:8px;padding:10px;font-family:inherit;font-size:.9rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
@@ -1202,7 +1204,11 @@ function goToChat() {
   };
 
   onValue(ref(db, 'chat/notice'), snap => renderMsg(snap.exists() ? snap.val() : null, ov.querySelector('#noticeList'), 'notice'));
-  onValue(ref(db, 'chat/free'),   snap => renderMsg(snap.exists() ? snap.val() : null, ov.querySelector('#freeList'),   'free'));
+  onValue(ref(db, 'chat/free'), snap => {
+    renderMsg(snap.exists() ? snap.val() : null, ov.querySelector('#freeList'), 'free');
+    const scroll = ov.querySelector('#freeScroll');
+    if (scroll) setTimeout(() => { scroll.scrollTop = scroll.scrollHeight; }, 50);
+  });
 
   if (isAdmin()) {
     ov.querySelector('#noticeSubmit').onclick = async () => {

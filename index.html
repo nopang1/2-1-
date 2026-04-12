@@ -279,8 +279,7 @@ tr:hover td{background:rgba(46,168,85,.06)}
       </div>
     </div>
     <div class="grid">
-      <div class="card"><h3>💺 자리 변경 우선권</h3><div class="price">가격: <span>30 코인</span></div><div style="font-size:.75rem;color:#f9a825;margin-bottom:8px" id="seatStatus"></div><button id="buy0">구매</button></div>
-      <div class="card"><h3>🧹 청소 면제</h3><div class="price">가격: <span>10 코인</span></div><div style="font-size:.75rem;color:#f9a825;margin-bottom:8px" id="cleanStatus"></div><button id="buy1">구매</button></div>
+      <div class="card"><h3>💺 자리 변경 우선권</h3><div class="price">가격: <span>30 코인</span></div><button id="buy0">구매</button></div>
       <div class="card"><h3>🛒 매점 1000원권</h3><div class="price">가격: <span>10 코인</span></div><button id="buy2">구매</button></div>
       <div class="card"><h3>🛒 매점 5000원권</h3><div class="price">가격: <span>50 코인</span></div><button id="buy3">구매</button></div>
     </div>
@@ -456,8 +455,6 @@ async function enterApp(user) {
   g('coins').textContent = isAdmin() ? '∞' : coins[si()];
   subscribeCoins();
   updateTable();
-  await updateCleanStatus();
-  await updateSeatStatus();
 }
 
 // ── 초기 데이터 로드 ───────────────────────────────────
@@ -579,18 +576,7 @@ async function buyExec(price, item) {
   if (isAdmin()) { alert('학생만 구매 가능해요'); return; }
   if (coins[si()] < price) { alert('코인이 부족해요 😢'); return; }
 
-  if (item === '자리 변경 우선권') {
-    const buyers = await getSeatMonth();
-    if (buyers.includes(me)) { alert('이번 달 이미 자리 변경 우선권을 구매했어요!'); return; }
-    if (buyers.length >= SEAT_LIMIT) { alert(`이번 달 자리 변경 우선권은 마감됐어요!`); return; }
-    await saveSeatMonth([...buyers, me]);
-  }
-  if (item === '청소 면제') {
-    const buyers = await getCleanToday();
-    if (buyers.includes(me)) { alert('오늘 이미 청소 면제를 구매했어요!'); return; }
-    if (buyers.length >= CLEAN_LIMIT) { alert(`오늘 청소 면제는 마감됐어요!`); return; }
-    await saveCleanToday([...buyers, me]);
-  }
+
   const idx = si();
   coins[idx] -= price;
   await fbSet(`coins/${idx}`, coins[idx]);
@@ -598,8 +584,6 @@ async function buyExec(price, item) {
   alert(`${item} 구매 완료 ✅`);
   g('coins').textContent = coins[idx];
   updateTable();
-  await updateCleanStatus();
-  await updateSeatStatus();
 }
 
 // ── 테이블 ────────────────────────────────────────────
@@ -1131,7 +1115,7 @@ function goToChat() {
     <div style="max-width:700px;margin:0 auto">
       <div style="display:flex;gap:0;margin-bottom:20px;border-radius:10px;overflow:hidden;border:2px solid var(--green-mid)">
         <button id="tabNotice" style="flex:1;padding:12px;border-radius:0;background:var(--green);color:white;border:none;font-family:inherit;font-weight:800;font-size:.95rem;cursor:pointer">📢 공지사항</button>
-        <button id="tabFree" style="flex:1;padding:12px;border-radius:0;background:var(--surface2);color:var(--text-muted);border:none;font-family:inherit;font-weight:800;font-size:.95rem;cursor:pointer">💬 국민 신문고</button>
+        <button id="tabFree" style="flex:1;padding:12px;border-radius:0;background:var(--surface2);color:var(--text-muted);border:none;font-family:inherit;font-weight:800;font-size:.95rem;cursor:pointer">💬 자유게시판</button>
       </div>
       <div id="panelNotice">
         <div id="noticeList" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;min-height:80px"></div>
@@ -1184,7 +1168,7 @@ function goToChat() {
       container.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:40px;font-size:.88rem">${type==='notice'?'아직 공지가 없어요':'아직 게시물이 없어요'} 📭</div>`;
       return;
     }
-    // 국민 신문고는 오래된 글이 위 (카톡처럼), 공지는 최신순
+    // 자유게시판은 오래된 글이 위 (카톡처럼), 공지는 최신순
     const msgs = type === 'free'
       ? Object.entries(data)
       : Object.entries(data).reverse();
@@ -1260,7 +1244,6 @@ function bindEvents() {
   g('btnDoReset').onclick    = doReset;
   g('btnCancelReset').onclick = cancelReset;
   g('buy0').onclick = () => buy(30,'자리 변경 우선권');
-  g('buy1').onclick = () => buy(10,'청소 면제');
   g('buy2').onclick = () => buy(10,'매점 1000원권');
   g('buy3').onclick = () => buy(50,'매점 5000원권');
   g('sortByNum').onclick  = () => setSortOrder('num');
